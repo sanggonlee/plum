@@ -1,0 +1,29 @@
+.app {
+  text-align: center;
+}
+
+/* https://github.com/Cosbgn/tailwindcss-tooltips */
+.tooltip .tooltip-text {
+  visibility: hidden;
+  padding: 2px 6px;
+  position: absolute;
+  z-index: 100;
+}
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+}
+
+/* https://stackoverflow.com/questions/3387489/make-child-visible-outside-an-overflowhidden-parent */
+.clearfix:before,
+.clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+.clearfix:after {
+  clear: both;
+}
+.clearfix {
+  zoom: 1;
+} /* IE < 8 */

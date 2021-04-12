@@ -1,0 +1,6 @@
+env.sh
+
+# ui
+build
+node_modules
+.eslintcache
