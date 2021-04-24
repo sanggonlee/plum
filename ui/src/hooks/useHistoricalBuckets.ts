@@ -1,11 +1,7 @@
 import { useCallback } from "react";
-import { atom, useRecoilState } from "recoil";
-import { TablesBucket } from "api";
-
-const historicalBucketsState = atom({
-  key: "HISTORICAL_BUCKETS",
-  default: {},
-});
+import { useRecoilState } from "recoil";
+import { historicalBucketsState } from "state";
+import { TablesBucket } from "types";
 
 export default function useHistoricalBuckets(): [
   {

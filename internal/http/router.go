@@ -7,6 +7,10 @@ import (
 	"github.com/go-chi/chi/middleware"
 )
 
+const (
+	urlParamFilename = "filename"
+)
+
 // Handler sets up the router for APIs
 func (h *Handler) Handler() http.Handler {
 	r := chi.NewRouter()
@@ -17,7 +21,10 @@ func (h *Handler) Handler() http.Handler {
 	})
 
 	r.Route("/timeseries", func(r chi.Router) {
-		r.Get("/", h.StartTimeSeriesConnection)
+		r.Get("/", h.StartTimeseriesConnection)
+		r.Get("/replay", h.StartTimeseriesReplayConnection)
+		r.Get("/download/{"+urlParamFilename+"}", h.DownloadTimeseriesDataFile)
+		r.Post("/upload", h.UploadTimeseriesDataFile)
 	})
 
 	r.Route("/pg_settings", func(r chi.Router) {

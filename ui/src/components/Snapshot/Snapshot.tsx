@@ -1,9 +1,10 @@
+import { memo } from "react";
 import { useLocation } from "react-router-dom";
-import { TablesBucket, Table } from "api";
-import TableSnapshot from "./TableSnapshot";
+import { Table, TablesBucket } from "types";
 import { getLocalStorageItem } from "utils";
+import TableSnapshot from "./TableSnapshot";
 
-export default function Snapshot() {
+function Snapshot() {
   const location = useLocation();
   const time = new URLSearchParams(location.search).get("time");
   if (!time) {
@@ -26,3 +27,5 @@ export default function Snapshot() {
     </div>
   );
 }
+
+export default memo(Snapshot);

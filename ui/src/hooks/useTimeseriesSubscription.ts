@@ -1,21 +1,28 @@
 import { useCallback, useMemo } from "react";
-import { atom, useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { RootBucket } from "monochron";
-import { Process, Table, TablesBucket } from "api";
 import { WebsocketSubscriptionType, registerWebsocketSource } from "api/ws";
-import useHistoricalBuckets from "hooks/useHistoricalBuckets";
 import useCachedLocalStorage from "hooks/useCachedLocalStorage";
-import { LocalStorageFixedKey, TableSetting } from "types";
+import useHistoricalBuckets from "hooks/useHistoricalBuckets";
+import useTimeseriesPersistence from "hooks/useTimeseriesPersistence";
+import { bucketState, timeseriesStartState } from "state";
+import {
+  Process,
+  Table,
+  TablesBucket,
+  LocalStorageFixedKey,
+  SubscriptionType,
+  TableSetting,
+} from "types";
+import { formatTimeseriesFilename } from "utils";
 
-const bucketState = atom({
-  key: "BUCKET",
-  default: undefined,
-});
-
-export default function useTimeseriesSubscription(): [
+export default function useTimeseriesSubscription(
+  type: SubscriptionType
+): [
   RootBucket | undefined,
   {
-    subscribe: Function;
+    subscribeMonitor: Function;
+    subscribeReplay: Function;
     unsubscribe: Function;
   }
 ] {
@@ -23,39 +30,78 @@ export default function useTimeseriesSubscription(): [
     RootBucket | undefined,
     Function
   ] = useRecoilState(bucketState);
-
+  const [setTimeseriesStart] = useTimeseriesPersistence();
   const [, { addToHistoricalBuckets }] = useHistoricalBuckets();
   const [settings] = useCachedLocalStorage(LocalStorageFixedKey.Settings);
 
-  const wsSource = useMemo(
-    () =>
-      registerWebsocketSource(
-        WebsocketSubscriptionType.Tables,
-        {
-          interval: settings.timeseriesInterval,
-          relations: settings.tables
-            .filter((table: TableSetting) => table.isOn)
-            .map((table: TableSetting) => table.relname),
-        },
-        (bucket: TablesBucket) => {
-          if (bucket === undefined) {
-            return;
-          }
+  const _handleTablesBucket = useCallback(
+    (bucket: TablesBucket) => {
+      if (bucket === undefined) {
+        return;
+      }
 
-          addToHistoricalBuckets(bucket);
-          setNewBucket(tablesBucketToMonochronBucket(bucket));
-        }
-      ),
-    [addToHistoricalBuckets, setNewBucket, settings]
+      addToHistoricalBuckets(bucket);
+      setNewBucket(tablesBucketToMonochronBucket(bucket));
+    },
+    [addToHistoricalBuckets, setNewBucket]
   );
 
-  const subscribe = useCallback(() => wsSource.subscribe(), [wsSource]);
-  const unsubscribe = useCallback(() => wsSource.unsubscribe(), [wsSource]);
+  const tablesMonitorSubscription = useMemo(
+    () =>
+      registerWebsocketSource(
+        WebsocketSubscriptionType.TablesMonitor,
+        _handleTablesBucket
+      ),
+    [_handleTablesBucket]
+  );
+
+  const tablesReplaySubscription = useMemo(
+    () =>
+      registerWebsocketSource(
+        WebsocketSubscriptionType.TablesReplay,
+        _handleTablesBucket
+      ),
+    [_handleTablesBucket]
+  );
+
+  const wsSource = useMemo(
+    () =>
+      type === SubscriptionType.MONITOR
+        ? tablesMonitorSubscription
+        : tablesReplaySubscription,
+    [type, tablesMonitorSubscription, tablesReplaySubscription]
+  );
+
+  const subscribeMonitor = useCallback(() => {
+    wsSource.subscribe({
+      interval: settings.timeseriesInterval,
+      relations: settings.tables
+        .filter((table: TableSetting) => table.isOn)
+        .map((table: TableSetting) => table.relname),
+      save_as: setTimeseriesStart(),
+    });
+  }, [wsSource, setTimeseriesStart, settings]);
+
+  const subscribeReplay = useCallback(
+    (fileId) => {
+      wsSource.subscribe({
+        interval: settings.timeseriesInterval,
+        file_id: fileId,
+      });
+    },
+    [wsSource, settings]
+  );
+
+  const unsubscribe = useCallback(() => {
+    wsSource.unsubscribe();
+    setNewBucket(undefined);
+  }, [wsSource, setNewBucket]);
 
   return [
     newBucket,
     {
-      subscribe,
+      subscribeMonitor,
+      subscribeReplay,
       unsubscribe,
     },
   ];

@@ -8,7 +8,7 @@ import (
 
 // GetUserTables retrieves all the existing user tables (pg_stats_user_tables)
 func (h *Handler) GetUserTables(w http.ResponseWriter, r *http.Request) {
-	tables, err := h.Store.GetUserTables(r.Context())
+	tables, err := h.Database.GetUserTables(r.Context())
 	if err != nil {
 		err = errors.Wrap(err, "getting user tables from store")
 		h.Logger.Println("GetUserTables:", err)
@@ -21,7 +21,7 @@ func (h *Handler) GetUserTables(w http.ResponseWriter, r *http.Request) {
 
 // GetTrackActivitiesSetting retrieves the track_activities postgres setting.
 func (h *Handler) GetTrackActivitiesSetting(w http.ResponseWriter, r *http.Request) {
-	trackActivitiesSetting, err := h.Store.GetTrackActivitiesSetting(r.Context())
+	trackActivitiesSetting, err := h.Database.GetTrackActivitiesSetting(r.Context())
 	if err != nil {
 		err = errors.Wrap(err, "getting track_activities setting from store")
 		h.Logger.Println("GetTrackActivitiesSetting:", err)

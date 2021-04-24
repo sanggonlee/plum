@@ -9,8 +9,10 @@ import (
 )
 
 type Handler struct {
-	Logger *log.Logger
-	Store  internal.Store
+	AllowedOrigins    string
+	LogTimeseriesData bool
+	Logger            *log.Logger
+	Database          internal.Database
 }
 
 // ListenAndServe is analogous to http.ListenAndServe, blocks and receives incoming requests.

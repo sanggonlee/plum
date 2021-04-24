@@ -1,24 +1,28 @@
-import { MouseEvent, useCallback, useEffect } from "react";
+import { memo, MouseEvent, useCallback, useEffect } from "react";
 import { Bucket, TimeseriesChart } from "monochron";
-import { Process, Table } from "api";
 import SubscriptionControl from "components/SubscriptionControl";
 import useHistoricalBuckets from "hooks/useHistoricalBuckets";
 import useTimeseriesSubscription from "hooks/useTimeseriesSubscription";
+import { Process, SubscriptionType, Table } from "types";
 import { setLocalStorageItem } from "utils";
 
 const defaultFrameCycle = 60 * 1000; // 1 minute
 const defaultRulerInterval = 5 * 1000; // 5 seconds
 
 interface TablesProps {
+  subscriptionType?: SubscriptionType;
   frameCycle?: number;
   rulerInterval?: number;
 }
 
-export default function Tables({
+function Tables({
+  subscriptionType = SubscriptionType.MONITOR,
   frameCycle = defaultFrameCycle,
   rulerInterval = defaultRulerInterval,
 }: TablesProps) {
-  const [newBucket, { unsubscribe }] = useTimeseriesSubscription();
+  const [newBucket, { unsubscribe }] = useTimeseriesSubscription(
+    SubscriptionType.MONITOR
+  );
   const [
     { getBucket, getBucketStartTime },
     { garbageCollect },
@@ -27,8 +31,9 @@ export default function Tables({
   useEffect(() => {
     return () => {
       unsubscribe();
+      garbageCollect(0);
     };
-  }, [unsubscribe]);
+  }, [unsubscribe, garbageCollect]);
 
   const _onChartClick = useCallback(
     (evt: MouseEvent, mappedTime: number) => {
@@ -54,7 +59,7 @@ export default function Tables({
   );
 
   return (
-    <SubscriptionControl>
+    <SubscriptionControl type={subscriptionType}>
       <TimeseriesChart
         width="100%"
         containerClass="flex-1"
@@ -97,3 +102,5 @@ export default function Tables({
     </SubscriptionControl>
   );
 }
+
+export default memo(Tables);

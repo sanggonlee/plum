@@ -1,16 +1,12 @@
-import { ChangeEvent } from "react";
+import { memo, ChangeEvent } from "react";
 
 interface CheckboxProps {
-  label: string;
+  label?: string;
   isChecked: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Checkbox({
-  label = "",
-  isChecked = false,
-  onChange,
-}: CheckboxProps) {
+function Checkbox({ label = "", isChecked = false, onChange }: CheckboxProps) {
   return (
     <div className="flex my-1 text-left cursor-pointer hover:bg-gray-200">
       <label className="w-full p-2 cursor-pointer">
@@ -20,3 +16,5 @@ export default function Checkbox({
     </div>
   );
 }
+
+export default memo(Checkbox);

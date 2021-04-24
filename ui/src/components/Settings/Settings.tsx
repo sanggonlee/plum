@@ -1,14 +1,15 @@
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, memo, useCallback, useMemo, useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { getTables } from "api";
+import { getTables } from "api/http";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
+import RadioGroup from "components/RadioGroup";
 import useCachedLocalStorage from "hooks/useCachedLocalStorage";
 import { LocalStorageFixedKey, TableSetting } from "types";
 
 const defaultTimeseriesInterval = 1000;
 
-export default function Settings() {
+function Settings() {
   const { addToast } = useToasts();
   const [storedSettings, storeSettings] = useCachedLocalStorage(
     LocalStorageFixedKey.Settings
@@ -16,17 +17,17 @@ export default function Settings() {
   const [timeseriesInterval, setTimeseriesInterval] = useState(
     storedSettings.timeseriesInterval ?? defaultTimeseriesInterval
   );
+  const [saveToFile, setSaveToFile] = useState(
+    storedSettings.saveToFile ?? false
+  );
   const [tableSettings, setTableSettings]: [
     TableSetting[],
     Function
   ] = useState(storedSettings.tables);
 
-  const _onTimeSeriesIntervalChange = useCallback(
-    (evt: ChangeEvent<HTMLInputElement>) => {
-      setTimeseriesInterval(+evt.target.value);
-    },
-    [setTimeseriesInterval]
-  );
+  const _onTimeSeriesIntervalChange = (evt: ChangeEvent<HTMLInputElement>) => {
+    setTimeseriesInterval(+evt.target.value);
+  };
 
   const _onTableSettingChange = useCallback(
     (evt: ChangeEvent<HTMLInputElement>, index: number) => {
@@ -45,13 +46,34 @@ export default function Settings() {
   const _onSave = useCallback(() => {
     storeSettings({
       timeseriesInterval,
+      saveToFile,
       tables: tableSettings,
     });
     addToast("Settings saved.", {
       appearance: "success",
       autoDismiss: true,
     });
-  }, [timeseriesInterval, tableSettings, storeSettings, addToast]);
+  }, [timeseriesInterval, saveToFile, tableSettings, storeSettings, addToast]);
+
+  const recordOptions = useMemo(
+    () => [
+      {
+        value: "true",
+        label: "Record",
+        checked: saveToFile,
+        onChange: (evt: ChangeEvent<HTMLInputElement>) =>
+          setSaveToFile(evt.target.checked),
+      },
+      {
+        value: "false",
+        label: "Do not record",
+        checked: !saveToFile,
+        onChange: (evt: ChangeEvent<HTMLInputElement>) =>
+          setSaveToFile(!evt.target.checked),
+      },
+    ],
+    [saveToFile, setSaveToFile]
+  );
 
   if (!tableSettings) {
     getTables().then((tablesData) => {
@@ -87,6 +109,10 @@ export default function Settings() {
           />
         </div>
       </div>
+      <div className="flex flex-col items-start my-5">
+        <div className="my-3 font-bold">Record timeseries data for replay</div>
+        <RadioGroup options={recordOptions} />
+      </div>
       <div className="flex flex-col items-start">
         <div className="my-3 font-bold">Subscribed Tables</div>
         <div className="w-full">
@@ -103,3 +129,5 @@ export default function Settings() {
     </div>
   );
 }
+
+export default memo(Settings);

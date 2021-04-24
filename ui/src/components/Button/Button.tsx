@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEvent, ReactNode, useState } from "react";
+import { CSSProperties, memo, MouseEvent, ReactNode, useState } from "react";
 
 interface ButtonProps {
   containerClassName?: string;
@@ -8,7 +8,7 @@ interface ButtonProps {
   children: ReactNode;
 }
 
-export default function Button({
+function Button({
   containerClassName = "",
   hoverContent,
   hoverStyle,
@@ -56,3 +56,5 @@ export default function Button({
     </div>
   );
 }
+
+export default memo(Button);

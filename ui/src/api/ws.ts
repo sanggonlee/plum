@@ -1,7 +1,10 @@
 import { WebsocketSource } from "types";
 
+const SERVER_WS_BASE_URL = process.env.REACT_APP_WS_SERVER_ORIGIN;
+
 export enum WebsocketSubscriptionType {
-  Tables = "Tables",
+  TablesMonitor = "TablesMonitor",
+  TablesReplay = "TablesReplay",
 }
 
 function invalidWebsocketSubscriptionTypeError(
@@ -15,50 +18,23 @@ const wsInstances: {
   [type in WebsocketSubscriptionType]?: WebsocketSource;
 } = {};
 
-// const wsSubscriptionTypeToUrl = {
-//   [WebsocketSubscriptionType.Tables]: "ws://localhost:8090/timeseries",
-// };
-
-function getWsSubscriptionUrl(
-  type: WebsocketSubscriptionType,
-  options: WebsocketOptions
-): string {
+function getWsSubscriptionUrl(type: WebsocketSubscriptionType): string {
   switch (type) {
-    case WebsocketSubscriptionType.Tables:
-      return `ws://localhost:8090/timeseries?${optionsToQueryParams(options)}`;
+    case WebsocketSubscriptionType.TablesMonitor:
+      return `${SERVER_WS_BASE_URL}/timeseries`;
+    case WebsocketSubscriptionType.TablesReplay:
+      return `${SERVER_WS_BASE_URL}/timeseries/replay`;
     default:
       console.error(invalidWebsocketSubscriptionTypeError(type));
       return "";
   }
 }
 
-// function getWsSubscriptionBucketTransformer(type: WebsocketSubscriptionType): Function {
-//   switch (type) {
-//     case WebsocketSubscriptionType.Tables:
-//       return (bucket: TablesBucket) => {
-//         if (bucket === undefined) {
-//           return;
-//         }
-
-//         return tablesBucketToMonochronBucket(bucket);
-//       };
-//     default:
-//       console.error(invalidWebsocketSubscriptionTypeError(type));
-//       return () => {};
-//   }
-// }
-
-interface WebsocketOptions {
-  interval?: number;
-  relations?: string[];
-}
-
 export function registerWebsocketSource(
   type: WebsocketSubscriptionType,
-  options: WebsocketOptions,
   callback: Function
 ): WebsocketSource {
-  const url = getWsSubscriptionUrl(type, options);
+  const url = getWsSubscriptionUrl(type);
   if (url === "") {
     return new WebsocketSource();
   }
@@ -86,37 +62,3 @@ export function getWebsocketSource(
   }
   return wsInstances[type];
 }
-
-function optionsToQueryParams(options: WebsocketOptions): string {
-  const opts = options as any;
-  return Object.keys(opts)
-    .filter((key) => !!opts[key])
-    .map((key) => {
-      let val = opts[key];
-      if (Array.isArray(val)) {
-        val = val.join(",");
-      }
-      return `${key}=${val}`;
-    })
-    .join("&");
-}
-
-// function tablesBucketToMonochronBucket(bucket: TablesBucket): TopBucket {
-//   return {
-//     t_start: bucket.t_start,
-//     t_end: bucket.t_end,
-//     entries: bucket.table_states.map((table: Table) => ({
-//       key: table.name,
-//       start: 0,
-//       end: 0,
-//       data: table,
-//       buckets: table.processes.map((process: Process) => ({
-//         key: process.pid,
-//         start: 0,
-//         end: 0,
-//         data: process,
-//         buckets: [],
-//       })),
-//     })),
-//   };
-// }

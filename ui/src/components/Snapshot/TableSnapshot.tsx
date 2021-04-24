@@ -1,4 +1,4 @@
-import { Process, Table } from "api";
+import { Lock, Process, Table } from "types";
 
 interface TableSnapshotProps {
   tableData: Table;
@@ -8,6 +8,24 @@ export default function TableSnapshot({ tableData }: TableSnapshotProps) {
   const _formatBlockingPids = (process: Process) => {
     const blockingPids = process.blocked_by;
     return blockingPids?.length ? blockingPids.join(",") : "None";
+  };
+
+  const _formatLockInfo = (lock: Lock, index: number) => {
+    return (
+      <div key={index} className="flex flex-row mb-5">
+        <span className="flex flex-initial w-px border"></span>
+        <div className="flex-1">
+          <div className="m-1 p-1">Lock type: {lock.locktype}</div>
+          <div className="m-1 p-1">Mode: {lock.mode}</div>
+          <div className="m-1 p-1">transactionid: {lock.transactionid}</div>
+          <div className="m-1 p-1">
+            virtualtransaction: {lock.virtualtransaction}
+          </div>
+          <div className="m-1 p-1">virtualxid: {lock.virtualxid}</div>
+          <div className="m-1 p-1">Locked row: {lock.locked_row}</div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -40,6 +58,8 @@ export default function TableSnapshot({ tableData }: TableSnapshotProps) {
             <div className="m-1 p-1">
               Wait event type: {process.wait_event_type}
             </div>
+            <div className="m-1 p-1">Locks:</div>
+            <div className="ml-3 p-1">{process.locks.map(_formatLockInfo)}</div>
           </div>
         ))}
       </div>

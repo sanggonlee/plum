@@ -1,33 +1,36 @@
+import { TimeseriesAPIOptions } from "types/timeseries";
+import { optionsToQueryParams } from "utils";
+
 const emptyFunction = () => {};
 
 export class WebsocketSource {
-  private url: string;
   private ws: WebSocket | undefined;
-  private callback: Function;
 
-  constructor(url: string = "", callback?: Function) {
-    this.url = url;
+  constructor(
+    private baseUrl: string = "",
+    private callback: Function = emptyFunction
+  ) {
     this.ws = undefined;
-    this.callback = callback || emptyFunction;
   }
 
   public getUrl(): string {
-    return this.url;
+    return this.baseUrl;
   }
 
-  public subscribe() {
+  public subscribe(options: TimeseriesAPIOptions) {
     if (this.callback === emptyFunction) {
       return;
     }
 
-    console.log(`Establishing webSocket connection for ${this.url}`);
-    this.ws = new WebSocket(this.url);
+    const url = `${this.baseUrl}?${optionsToQueryParams(options)}`;
+    console.log(`Establishing webSocket connection for ${url}`);
+    this.ws = new WebSocket(url);
     this.ws.onmessage = (evt) => {
       const bucket = JSON.parse(evt.data);
       this.callback(bucket);
     };
     this.ws.onclose = () => {
-      console.log(`WebSocket connection closing for ${this.url}`);
+      console.log(`WebSocket connection closing for ${url}`);
     };
   }
 
@@ -35,7 +38,6 @@ export class WebsocketSource {
     if (this.ws) {
       this.ws.close();
       this.ws = undefined;
-      //this.ws.onmessage = (evt) => {};
     }
   }
 }

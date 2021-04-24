@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"database/sql"
-	"io"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -27,6 +27,10 @@ func New(o Options) (*Postgres, error) {
 		return nil, errors.Wrap(err, "opening db")
 	}
 
+	if err = db.Ping(); err != nil {
+		return nil, errors.Wrap(err, "connection failure")
+	}
+
 	return &Postgres{db}, nil
 }
 
@@ -49,21 +53,11 @@ func connStrFromOptions(o Options) string {
 	}
 
 	var b strings.Builder
-	writeConnStrParam(&b, "dbname", o.Database)
-	writeConnStrParam(&b, "host", o.Host)
-	writeConnStrParam(&b, "password", o.Password)
-	writeConnStrParam(&b, "port", port)
-	writeConnStrParam(&b, "sslmode", sslmode)
-	writeConnStrParam(&b, "user", o.Username)
+	b.WriteString(fmt.Sprintf("dbname='%s'", o.Database))
+	b.WriteString(fmt.Sprintf("host='%s'", o.Host))
+	b.WriteString(fmt.Sprintf("port='%s'", port))
+	b.WriteString(fmt.Sprintf("user='%s'", o.Username))
+	b.WriteString(fmt.Sprintf("password='%s'", o.Password))
+	b.WriteString(fmt.Sprintf("sslmode='%s'", sslmode))
 	return b.String()
-}
-
-func writeConnStrParam(w io.StringWriter, name, value string) { //nolint:interfacer
-	if value == "" {
-		return
-	}
-	_, _ = w.WriteString(name)
-	_, _ = w.WriteString("='")
-	_, _ = w.WriteString(strings.Replace(value, "'", `\'`, -1))
-	_, _ = w.WriteString("' ")
 }

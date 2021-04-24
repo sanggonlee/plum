@@ -1,7 +1,11 @@
-import axios from "axios";
-
 export interface Lock {
-  lock_type: string;
+  locktype?: string;
+  mode?: string;
+  transactionid?: string;
+  virtualtransaction?: string;
+  virtualxid?: string;
+
+  locked_row?: string;
 }
 
 export interface Process {
@@ -31,16 +35,6 @@ export interface Process {
   locks: Lock[];
 }
 
-// export interface Process extends Activity {
-//   //pid: string; // PID won't be meaningfully used as a number, so take it as string
-//   //activity: Activity;
-//   blocked_by: number[];
-//   locks: Lock[];
-
-//   //start: number;
-//   //end: number;
-// }
-
 export interface Table {
   relid: number;
   relname: string;
@@ -50,20 +44,8 @@ export interface Table {
   end: number;
 }
 
-// export interface Bucket {
-//   t_start: string;
-//   t_end: string;
-//   table_states: Table[];
-// }
-
 export interface TablesBucket {
   t_start: string;
   t_end: string;
   table_states: Table[];
-}
-
-export async function getTables() {
-  const resp = await axios.get<Table[]>("http://localhost:8090/user_tables");
-  const { data } = resp;
-  return data;
 }

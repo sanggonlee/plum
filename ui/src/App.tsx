@@ -1,8 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
 import { ToastProvider } from "react-toast-notifications";
 import { RecoilRoot } from "recoil";
-import Router from "components/Router";
-import Sidebar from "components/Sidebar";
+import Router from "./components/Router";
+import Sidebar from "./components/Sidebar";
 
 import "./App.css";
 
