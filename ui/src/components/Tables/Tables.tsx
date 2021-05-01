@@ -1,23 +1,22 @@
 import { memo, MouseEvent, useCallback, useEffect } from "react";
 import { Bucket, TimeseriesChart } from "monochron";
 import SubscriptionControl from "components/SubscriptionControl";
+import useCachedLocalStorage from "hooks/useCachedLocalStorage";
 import useHistoricalBuckets from "hooks/useHistoricalBuckets";
 import useTimeseriesSubscription from "hooks/useTimeseriesSubscription";
-import { Process, SubscriptionType, Table } from "types";
+import { LocalStorageFixedKey, Process, SubscriptionType, Table } from "types";
 import { setLocalStorageItem } from "utils";
 
-const defaultFrameCycle = 60 * 1000; // 1 minute
-const defaultRulerInterval = 10 * 1000; // 10 seconds
+const defaultFrameCycle = 60_000; // 1 minute
+const defaultRulerInterval = 10_000; // 10 seconds
 
 interface TablesProps {
   subscriptionType?: SubscriptionType;
-  frameCycle?: number;
   rulerInterval?: number;
 }
 
 function Tables({
   subscriptionType = SubscriptionType.MONITOR,
-  frameCycle = defaultFrameCycle,
   rulerInterval = defaultRulerInterval,
 }: TablesProps) {
   const [newBucket, { unsubscribe }] = useTimeseriesSubscription(
@@ -27,6 +26,8 @@ function Tables({
     { getBucket, getBucketStartTime },
     { garbageCollect },
   ] = useHistoricalBuckets();
+  const [settings] = useCachedLocalStorage(LocalStorageFixedKey.Settings);
+  const frameCycle = settings.frameCycle ?? defaultFrameCycle;
 
   useEffect(() => {
     return () => {

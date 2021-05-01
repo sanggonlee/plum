@@ -1,5 +1,7 @@
 # plum
 
+<a href="https://github.com/sanggonlee/plum/releases/latest"><img src="https://img.shields.io/github/release/sanggonlee/plum.svg" alt="Latest release"></a>
+
 plum is a lightweight tool for investigating and exploring lock contention or deadlock in PostgreSQL.
 
 ## What's with the name?
@@ -23,7 +25,7 @@ He likes making jokes, but this time he wasn't joking. I found this very enterta
 * Record and replay the monitored session.
 * Drill down into a specific moment to gain insight of the locks held at that moment.
 ![Screenshot-2](/screenshots/2.png)
-* Control realtime update interval, which tables to monitor, etc.
+* Control interval for realtime update, which tables to monitor, etc.
 ![Screenshot-3](/screenshots/3.png)
 
 ## Instructions

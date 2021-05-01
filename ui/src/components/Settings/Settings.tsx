@@ -8,6 +8,7 @@ import useCachedLocalStorage from "hooks/useCachedLocalStorage";
 import { LocalStorageFixedKey, TableSetting } from "types";
 
 const defaultTimeseriesInterval = 1000;
+const defaultFrameCycle = 60_000;
 
 function Settings() {
   const { addToast } = useToasts();
@@ -16,6 +17,9 @@ function Settings() {
   );
   const [timeseriesInterval, setTimeseriesInterval] = useState(
     storedSettings.timeseriesInterval ?? defaultTimeseriesInterval
+  );
+  const [frameCycle, setFrameCycle] = useState(
+    storedSettings.frameCycle ?? defaultFrameCycle
   );
   const [saveToFile, setSaveToFile] = useState(
     storedSettings.saveToFile ?? false
@@ -26,8 +30,20 @@ function Settings() {
   ] = useState(storedSettings.tables);
 
   const _onTimeSeriesIntervalChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    setTimeseriesInterval(+evt.target.value);
+    const val = Number(evt.target.value);
+    if (isNaN(val)) {
+      return;
+    }
+    setTimeseriesInterval(val);
   };
+
+  const _onFrameCycleChange = (evt: ChangeEvent<HTMLInputElement>) => {
+    const val = Number(evt.target.value);
+    if (isNaN(val)) {
+      return;
+    }
+    setFrameCycle(val);
+  }
 
   const _onTableSettingChange = useCallback(
     (evt: ChangeEvent<HTMLInputElement>, index: number) => {
@@ -46,6 +62,7 @@ function Settings() {
   const _onSave = useCallback(() => {
     storeSettings({
       timeseriesInterval,
+      frameCycle,
       saveToFile,
       tables: tableSettings,
     });
@@ -53,7 +70,7 @@ function Settings() {
       appearance: "success",
       autoDismiss: true,
     });
-  }, [timeseriesInterval, saveToFile, tableSettings, storeSettings, addToast]);
+  }, [timeseriesInterval, frameCycle, saveToFile, tableSettings, storeSettings, addToast]);
 
   const recordOptions = useMemo(
     () => [
@@ -100,13 +117,27 @@ function Settings() {
         </Button>
       </div>
       <div className="flex flex-col items-start my-5">
-        <div className="my-3 font-bold">Timeseries Interval (milliseconds)</div>
+        <div className="my-3 font-bold">Timeseries interval</div>
         <div>
           <input
             className="border rounded-md p-3"
+            type="number"
             value={timeseriesInterval}
             onChange={_onTimeSeriesIntervalChange}
           />
+          <span> ms</span>
+        </div>
+      </div>
+      <div className="flex flex-col items-start my-5">
+        <div className="my-3 font-bold">Frame cycle</div>
+        <div>
+          <input
+            className="border rounded-md p-3"
+            type="number"
+            value={frameCycle}
+            onChange={_onFrameCycleChange}
+          />
+          <span> ms</span>
         </div>
       </div>
       <div className="flex flex-col items-start my-5">
@@ -114,7 +145,7 @@ function Settings() {
         <RadioGroup options={recordOptions} />
       </div>
       <div className="flex flex-col items-start">
-        <div className="my-3 font-bold">Subscribed Tables</div>
+        <div className="my-3 font-bold">Subscribed tables</div>
         <div className="w-full">
           {tableSettings.map((tableSetting: TableSetting, index: number) => (
             <Checkbox
