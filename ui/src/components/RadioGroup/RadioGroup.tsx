@@ -21,7 +21,6 @@ function RadioGroup({ options }: RadioGroupProps) {
           <label className="w-full p-2 cursor-pointer">
             <input
               type="radio"
-              //id={id}
               value={value}
               checked={checked}
               onChange={onChange}

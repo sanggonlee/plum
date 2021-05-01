@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { RootBucket } from "monochron";
 import { WebsocketSubscriptionType, registerWebsocketSource } from "api/ws";
 import useCachedLocalStorage from "hooks/useCachedLocalStorage";
 import useHistoricalBuckets from "hooks/useHistoricalBuckets";
 import useTimeseriesPersistence from "hooks/useTimeseriesPersistence";
-import { bucketState, timeseriesStartState } from "state";
+import { bucketState } from "state";
 import {
   Process,
   Table,
@@ -14,7 +14,6 @@ import {
   SubscriptionType,
   TableSetting,
 } from "types";
-import { formatTimeseriesFilename } from "utils";
 
 export default function useTimeseriesSubscription(
   type: SubscriptionType

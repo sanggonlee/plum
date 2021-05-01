@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/sanggonlee/asyncio"
 	"github.com/sanggonlee/plum"
 
 	"github.com/gorilla/websocket"
@@ -72,7 +71,7 @@ func (h *Handler) StartTimeseriesConnection(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err = h.sendTimeseriesData(w, r, params.Interval, func(cw io.WriteCloser, t time.Time) (io.Writer, []byte, error) {
-		wr := asyncio.AsyncMultiWriter(append(extraWriters, cw)...)
+		wr := io.MultiWriter(append(extraWriters, cw)...)
 
 		ctx := context.Background()
 		bucket, err := h.getPGTablesSnapshot(ctx, params.Relations, t, t.Add(params.Interval))
@@ -90,93 +89,6 @@ func (h *Handler) StartTimeseriesConnection(w http.ResponseWriter, r *http.Reque
 		h.Logger.Println("Error:", err)
 		return
 	}
-
-	// params, err := h.parseTimeseriesParams(r)
-	// if err != nil {
-	// 	_ = sendErrorResponse(w, http.StatusBadRequest, err)
-	// 	return
-	// }
-
-	// websocketUpgrader := h.getWebsocketUpgrader()
-
-	// conn, err := websocketUpgrader.Upgrade(w, r, nil)
-	// if err != nil {
-	// 	err = errors.Wrap(err, "instantiating ws connection")
-	// 	h.Logger.Println("Error:", err)
-	// 	_ = sendErrorResponse(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-	// defer conn.Close()
-
-	// go func() {
-	// 	// Close the connection when it starts failing to read from client
-	// 	if _, _, err := conn.ReadMessage(); err != nil {
-	// 		conn.Close()
-	// 		return
-	// 	}
-	// }()
-
-	// ticker := time.NewTicker(params.Interval)
-	// defer ticker.Stop()
-
-	// var extraWriters []io.Writer
-	// var filename string
-
-	// if params.SaveAs != "" {
-	// 	filename = getTimeseriesDataFilePath(params.SaveAs)
-	// 	f, err := os.Create(filename)
-	// 	if err != nil {
-	// 		err = errors.Wrap(err, "creating jsonl file")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-
-	// 	extraWriters = append(extraWriters, f)
-	// }
-
-	// if h.LogTimeseriesData {
-	// 	extraWriters = append(extraWriters, h.Logger.Writer())
-	// }
-
-	// for t := range ticker.C {
-	// 	cw, err := conn.NextWriter(websocket.TextMessage)
-	// 	if err != nil {
-	// 		if err != websocket.ErrCloseSent {
-	// 			err = errors.Wrap(err, "getting next writer")
-	// 			h.Logger.Println("Error:", err)
-	// 		}
-	// 		return
-	// 	}
-
-	// 	ctx := context.Background()
-	// 	bucket, err := h.getPGTablesSnapshot(ctx, params.Relations, t, t.Add(params.Interval))
-	// 	if err != nil {
-	// 		err = errors.Wrap(err, "getting pg tables snapshot")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-
-	// 	bytes, err := json.Marshal(bucket)
-	// 	if err != nil {
-	// 		err = errors.Wrap(err, "marshal bucket")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-
-	// 	w := asyncio.AsyncMultiWriter(append(extraWriters, cw)...)
-
-	// 	if _, err := w.Write(append(bytes, '\n')); err != nil {
-	// 		err = errors.Wrap(err, "writing to writer")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-
-	// 	if err := cw.Close(); err != nil {
-	// 		err = errors.Wrap(err, "closing writer")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-	// }
 }
 
 func (h *Handler) parseTimeseriesParams(r *http.Request) (TimeseriesParams, error) {
@@ -259,93 +171,6 @@ func (h *Handler) StartTimeseriesReplayConnection(w http.ResponseWriter, r *http
 		h.Logger.Println("Error:", err)
 		return
 	}
-
-	// params, err := h.parseTimeseriesReplayParams(r)
-	// if err != nil {
-	// 	_ = sendErrorResponse(w, http.StatusBadRequest, err)
-	// 	return
-	// }
-
-	// filename := getTimeseriesDataFilePath(params.FileID)
-	// file, err := os.Open(filename)
-	// if err != nil {
-	// 	err = errors.Wrapf(err, "opening file %s", filename)
-	// 	h.Logger.Println("Error:", err)
-	// 	return
-	// }
-	// defer func() {
-	// 	h.Logger.Println("Deleting", filename)
-	// 	if err := os.Remove(filename); err != nil {
-	// 		err = errors.Wrapf(err, "deleting file %s", filename)
-	// 		h.Logger.Println("Error:", err)
-	// 	}
-	// }()
-
-	// dec := json.NewDecoder(file)
-
-	// websocketUpgrader := h.getWebsocketUpgrader()
-
-	// conn, err := websocketUpgrader.Upgrade(w, r, nil)
-	// if err != nil {
-	// 	err = errors.Wrap(err, "instantiating ws connection")
-	// 	h.Logger.Println("Error:", err)
-	// 	_ = sendErrorResponse(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-	// defer conn.Close()
-
-	// go func() {
-	// 	// Close the connection when it starts failing to read from client
-	// 	if _, _, err := conn.ReadMessage(); err != nil {
-	// 		conn.Close()
-	// 		return
-	// 	}
-	// }()
-
-	// ticker := time.NewTicker(params.Interval)
-	// defer ticker.Stop()
-
-	// for range ticker.C {
-	// 	cw, err := conn.NextWriter(websocket.TextMessage)
-	// 	if err != nil {
-	// 		if err != websocket.ErrCloseSent {
-	// 			err = errors.Wrap(err, "getting next writer")
-	// 			h.Logger.Println("Error:", err)
-	// 		}
-	// 		return
-	// 	}
-
-	// 	if !dec.More() {
-	// 		// Done reading
-	// 		return
-	// 	}
-
-	// 	var m map[string]interface{}
-	// 	if err = dec.Decode(&m); err != nil {
-	// 		err = errors.Wrap(err, "reading json chunk")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-
-	// 	bytes, err := json.Marshal(m)
-	// 	if err != nil {
-	// 		err = errors.Wrap(err, "marshaling a json chunk")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-
-	// 	if _, err := cw.Write(bytes); err != nil {
-	// 		err = errors.Wrap(err, "writing to writer")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-
-	// 	if err := cw.Close(); err != nil {
-	// 		err = errors.Wrap(err, "closing writer")
-	// 		h.Logger.Println("Error:", err)
-	// 		return
-	// 	}
-	// }
 }
 
 func (h *Handler) sendTimeseriesData(

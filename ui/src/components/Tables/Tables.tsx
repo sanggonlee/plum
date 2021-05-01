@@ -7,7 +7,7 @@ import { Process, SubscriptionType, Table } from "types";
 import { setLocalStorageItem } from "utils";
 
 const defaultFrameCycle = 60 * 1000; // 1 minute
-const defaultRulerInterval = 5 * 1000; // 5 seconds
+const defaultRulerInterval = 10 * 1000; // 10 seconds
 
 interface TablesProps {
   subscriptionType?: SubscriptionType;

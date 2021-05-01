@@ -8,9 +8,6 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.0
 	github.com/pkg/errors v0.9.1
-	github.com/sanggonlee/asyncio v0.0.0-00010101000000-000000000000
 	github.com/sanggonlee/pogo v1.0.0
 	gopkg.in/guregu/null.v3 v3.5.0
 )
-
-replace github.com/sanggonlee/asyncio => ../asyncio

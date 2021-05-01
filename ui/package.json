@@ -13,6 +13,7 @@
     "autoprefixer": "^9.8.6",
     "axios": "^0.21.1",
     "lodash": "^4.17.20",
+    "monochron": "^1.0.0",
     "postcss": "^7.0.35",
     "react": "file:../../monochron/node_modules/react",
     "react-dom": "file:../../monochron/node_modules/react-dom",
