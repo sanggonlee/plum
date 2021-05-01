@@ -1,6 +1,10 @@
 # plum
 
-<a href="https://github.com/sanggonlee/plum/releases/latest"><img src="https://img.shields.io/github/release/sanggonlee/plum.svg" alt="Latest release"></a>
+[![GitHub release](https://img.shields.io/github/release/sanggonlee/plum.svg?include_prereleases)](https://GitHub.com/sanggonlee/plum/releases?include_prereleases)
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/sanggonlee/plum?style=plastic)
+[![CodeFactor](https://www.codefactor.io/repository/github/sanggonlee/plum/badge)](https://www.codefactor.io/repository/github/sanggonlee/plum)
+[![made-with-Go](https://img.shields.io/badge/Made%20with-Go-1f425f.svg)](http://golang.org)
+[![GoReportCard example](https://goreportcard.com/badge/github.com/sanggonlee/plum)](https://goreportcard.com/report/github.com/sanggonlee/plum)
 
 plum is a lightweight tool for investigating and exploring lock contention or deadlock in PostgreSQL.
 
@@ -15,7 +19,7 @@ Me: Why did you name this variable plum?
 
 Him: I like plums.
 
-He likes making jokes, but this time he wasn't joking. I found this very entertaining, so that's how the name of this project came to be. Shall we call it favour-oriented naming? If you prefer a more boring version, you can remember it as "Postgres Locks Uner Monitoring" or something (I made that out of "plum", honestly).
+He likes making jokes, but this time he wasn't joking. I found this very entertaining, so that's how the name of this project came to be. If you prefer a more boring version, you can remember it as "Postgres Locks Uner Monitoring" or something (I made that out of "plum", honestly).
 
 ## Features
 
