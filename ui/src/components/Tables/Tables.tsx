@@ -47,7 +47,7 @@ function Tables({
       }
       const bucket = getBucket(bucketTimeKey);
       setLocalStorageItem(`historicalBucket::${bucketTimeKey}`, bucket);
-      window.open(`/tables/snapshot?time=${bucketTimeKey}`, "_blank");
+      window.open(`/monitor/snapshot?time=${bucketTimeKey}`, "_blank");
     },
     [getBucketStartTime, getBucket]
   );

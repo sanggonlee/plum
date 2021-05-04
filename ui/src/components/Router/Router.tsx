@@ -4,7 +4,7 @@ import { RouteConfig, routeConfigs } from "./routeConfigs";
 export default function Router() {
   return (
     <Switch>
-      <Redirect exact from="/" to="/tables" />
+      <Redirect exact from="/" to="/monitor" />
       {routeConfigs.map(({ path, render }: RouteConfig) => (
         <Route key={path} exact path={path}>
           {render()}

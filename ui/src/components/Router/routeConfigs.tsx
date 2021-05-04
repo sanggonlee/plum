@@ -12,8 +12,8 @@ export interface RouteConfig {
 
 export const routeConfigs: RouteConfig[] = [
   {
-    path: "/tables",
-    label: "Tables",
+    path: "/monitor",
+    label: "Monitor",
     isMenu: true,
     render: () => <Tables />,
   },
@@ -30,7 +30,7 @@ export const routeConfigs: RouteConfig[] = [
     render: () => <Settings />,
   },
   {
-    path: "/tables/snapshot",
+    path: "/monitor/snapshot",
     label: "Settings",
     isMenu: false,
     render: () => <Snapshot />,
