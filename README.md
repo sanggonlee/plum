@@ -8,6 +8,10 @@
 
 plum is a lightweight tool for investigating and exploring lock contention or deadlock in PostgreSQL.
 
+Primarily supported by two libraries:
+* [pogo](https://github.com/sanggonlee/pogo) (for backend querying)
+* [monochron](https://github.com/sanggonlee/monochron) (for React realtime chart)
+
 ## What's with the name?
 
 Several years ago, I was helping my friend learn coding for the first time. He was coding something like hello world in Java, and I was watching him do it. I noticed he named a Scanner variable as "plum", like this:
