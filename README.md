@@ -44,6 +44,8 @@ He likes making jokes, but this time he wasn't joking. I found this very enterta
 4. Back to the root directory, run `make run-ui`.
 5. The UI should start up at `localhost:3399`.
 
+[Instructions for the usage](https://lee-sg16.medium.com/use-plum-to-dig-through-postgresql-lock-contention-a6753d6e73b7)
+
 ## Caveats
 1. The statistics data might not reflect the most up-to-date state, because it doesn't include the queries or transactions still in progress.
 2. Depending on the permissions of the Postgres user you're using for plum, you might see some null values if the user doesn't have enough permissions.
