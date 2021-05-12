@@ -139,14 +139,6 @@ function SubscriptionControl({
       case SubscriptionState.RUNNING:
         return (
           <div className="flex flex-row flex-initial flex-initial justify-end items-end m-2">
-            {type === SubscriptionType.MONITOR && (
-              <Button
-                containerClassName="justify-self-end mx-2 bg-gray-200"
-                onClick={_pause}
-              >
-                Pause
-              </Button>
-            )}
             <Button
               containerClassName="justify-self-end mx-2 bg-gray-200"
               onClick={_stop}
