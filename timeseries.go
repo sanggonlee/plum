@@ -11,6 +11,7 @@ type Bucket struct {
 	TStart      time.Time    `json:"t_start"`
 	TEnd        time.Time    `json:"t_end"`
 	TableStates []TableState `json:"table_states"`
+	NumLocks    int          `json:"num_locks"`
 }
 
 // TableState represents a data snapshot of a table's state, including processes

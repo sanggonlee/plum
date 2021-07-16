@@ -330,13 +330,19 @@ func (h *Handler) getPGTablesSnapshot(
 ) (plum.Bucket, error) {
 	tableStates, err := h.Database.GetPGTables(ctx, relations)
 	if err != nil {
-		return plum.Bucket{}, errors.Wrap(err, "getting pg table states from store")
+		return plum.Bucket{}, errors.Wrap(err, "getting pg table states from db")
+	}
+
+	numLocks, err := h.Database.GetCurrentNumLocks(ctx)
+	if err != nil {
+		return plum.Bucket{}, errors.Wrap(err, "getting the current number of locks from db")
 	}
 
 	return plum.Bucket{
 		TStart:      start,
 		TEnd:        end,
 		TableStates: tableStates,
+		NumLocks:    numLocks,
 	}, nil
 }
 

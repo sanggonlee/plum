@@ -11,4 +11,5 @@ type Database interface {
 	GetPGTables(context.Context, []string) ([]plum.TableState, error)
 	GetUserTables(context.Context) (plum.Tables, error)
 	GetTrackActivitiesSetting(context.Context) (string, error)
+	GetCurrentNumLocks(context.Context) (int, error)
 }
