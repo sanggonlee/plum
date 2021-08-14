@@ -14,3 +14,8 @@ export const timeseriesStartState = atom({
   key: "TIMESERIES_START",
   default: 0,
 });
+
+export const numLocksState = atom<number[]>({
+  key: "NUM_LOCKS",
+  default: [],
+});

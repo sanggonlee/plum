@@ -24,10 +24,8 @@ function Settings() {
   const [saveToFile, setSaveToFile] = useState(
     storedSettings.saveToFile ?? false
   );
-  const [tableSettings, setTableSettings]: [
-    TableSetting[],
-    Function
-  ] = useState(storedSettings.tables);
+  const [tableSettings, setTableSettings]: [TableSetting[], Function] =
+    useState(storedSettings.tables);
 
   const _onTimeSeriesIntervalChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const val = Number(evt.target.value);
@@ -43,7 +41,7 @@ function Settings() {
       return;
     }
     setFrameCycle(val);
-  }
+  };
 
   const _onTableSettingChange = useCallback(
     (evt: ChangeEvent<HTMLInputElement>, index: number) => {
@@ -70,7 +68,14 @@ function Settings() {
       appearance: "success",
       autoDismiss: true,
     });
-  }, [timeseriesInterval, frameCycle, saveToFile, tableSettings, storeSettings, addToast]);
+  }, [
+    timeseriesInterval,
+    frameCycle,
+    saveToFile,
+    tableSettings,
+    storeSettings,
+    addToast,
+  ]);
 
   const recordOptions = useMemo(
     () => [

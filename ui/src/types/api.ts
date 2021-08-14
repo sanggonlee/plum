@@ -48,4 +48,5 @@ export interface TablesBucket {
   t_start: string;
   t_end: string;
   table_states: Table[];
+  num_locks: number;
 }

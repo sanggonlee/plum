@@ -5,7 +5,7 @@ import { WebsocketSubscriptionType, registerWebsocketSource } from "api/ws";
 import useCachedLocalStorage from "hooks/useCachedLocalStorage";
 import useHistoricalBuckets from "hooks/useHistoricalBuckets";
 import useTimeseriesPersistence from "hooks/useTimeseriesPersistence";
-import { bucketState } from "state";
+import { bucketState, numLocksState } from "state";
 import {
   Process,
   Table,
@@ -15,9 +15,7 @@ import {
   TableSetting,
 } from "types";
 
-export default function useTimeseriesSubscription(
-  type: SubscriptionType
-): [
+export default function useTimeseriesSubscription(type: SubscriptionType): [
   RootBucket | undefined,
   {
     subscribeMonitor: Function;
@@ -25,10 +23,9 @@ export default function useTimeseriesSubscription(
     unsubscribe: Function;
   }
 ] {
-  const [newBucket, setNewBucket]: [
-    RootBucket | undefined,
-    Function
-  ] = useRecoilState(bucketState);
+  const [newBucket, setNewBucket]: [RootBucket | undefined, Function] =
+    useRecoilState(bucketState);
+  const [, setNumLocks] = useRecoilState(numLocksState);
   const [setTimeseriesStart] = useTimeseriesPersistence();
   const [, { addToHistoricalBuckets }] = useHistoricalBuckets();
   const [settings] = useCachedLocalStorage(LocalStorageFixedKey.Settings);
@@ -41,8 +38,9 @@ export default function useTimeseriesSubscription(
 
       addToHistoricalBuckets(bucket);
       setNewBucket(tablesBucketToMonochronBucket(bucket));
+      setNumLocks((numLocks) => [...numLocks, bucket.num_locks]);
     },
-    [addToHistoricalBuckets, setNewBucket]
+    [addToHistoricalBuckets, setNewBucket, setNumLocks]
   );
 
   const tablesMonitorSubscription = useMemo(

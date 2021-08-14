@@ -1,9 +1,12 @@
 import { memo, MouseEvent, useCallback, useEffect } from "react";
+import { useRecoilState } from "recoil";
 import { Bucket, TimeseriesChart } from "monochron";
+import NumLocksChart from "components/NumLocksChart";
 import SubscriptionControl from "components/SubscriptionControl";
 import useCachedLocalStorage from "hooks/useCachedLocalStorage";
 import useHistoricalBuckets from "hooks/useHistoricalBuckets";
 import useTimeseriesSubscription from "hooks/useTimeseriesSubscription";
+import { numLocksState } from "state";
 import { LocalStorageFixedKey, Process, SubscriptionType, Table } from "types";
 import { setLocalStorageItem } from "utils";
 
@@ -22,12 +25,12 @@ function Tables({
   const [newBucket, { unsubscribe }] = useTimeseriesSubscription(
     SubscriptionType.MONITOR
   );
-  const [
-    { getBucket, getBucketStartTime },
-    { garbageCollect },
-  ] = useHistoricalBuckets();
+  const [, setNumLocks] = useRecoilState(numLocksState);
+  const [{ getBucket, getBucketStartTime }, { garbageCollect }] =
+    useHistoricalBuckets();
   const [settings] = useCachedLocalStorage(LocalStorageFixedKey.Settings);
   const frameCycle = settings.frameCycle ?? defaultFrameCycle;
+  const timeseriesInterval = settings.timeseriesInterval;
 
   useEffect(() => {
     return () => {
@@ -55,51 +58,64 @@ function Tables({
   const _onTimeframeChange = useCallback(
     (newTimeframeStart) => {
       garbageCollect(newTimeframeStart);
+      setNumLocks((numLocks) => {
+        const threshold = Math.ceil(numLocks.length / 2);
+        return [...numLocks.slice(threshold)];
+      });
     },
-    [garbageCollect]
+    [garbageCollect, setNumLocks]
   );
 
   return (
     <SubscriptionControl type={subscriptionType}>
-      <TimeseriesChart
-        width="100%"
-        containerClass="flex-1"
-        options={{
-          frameCycle,
-          rulerInterval,
-        }}
-        newBucket={newBucket}
-        onClick={_onChartClick}
-        onTimeframeChange={_onTimeframeChange}
-        renderRow={(tableBucket: Bucket, Row: any) => {
-          const table = tableBucket.data as Table;
-          return (
-            <Row
-              key={tableBucket.key}
-              start={tableBucket.start}
-              end={tableBucket.end}
-              containerClassName="my-1 py-2 shadow-sm"
-            >
-              {table.relname}
-              {(tableBucket.buckets ?? []).map(
-                (processBucket: Bucket, pIndex: number) => {
-                  const process = processBucket.data as Process;
-                  return (
-                    <Row
-                      key={pIndex}
-                      start={processBucket.start}
-                      end={processBucket.end}
-                      containerClassName="mx-0 my-0.5 py-1 bg-blue-200 whitespace-nowrap"
-                    >
-                      <p>PID:{process.pid}</p>
-                    </Row>
-                  );
-                }
-              )}
-            </Row>
-          );
-        }}
-      />
+      <>
+        <NumLocksChart
+          containerClass="mx-10"
+          options={{
+            frameCycle,
+            timeseriesInterval,
+          }}
+        />
+        <TimeseriesChart
+          width="100%"
+          containerClass="flex-1"
+          options={{
+            frameCycle,
+            rulerInterval,
+          }}
+          newBucket={newBucket}
+          onClick={_onChartClick}
+          onTimeframeChange={_onTimeframeChange}
+          renderRow={(tableBucket: Bucket, Row: any) => {
+            const table = tableBucket.data as Table;
+            return (
+              <Row
+                key={tableBucket.key}
+                start={tableBucket.start}
+                end={tableBucket.end}
+                containerClassName="my-1 py-2 shadow-sm"
+              >
+                {table.relname}
+                {(tableBucket.buckets ?? []).map(
+                  (processBucket: Bucket, pIndex: number) => {
+                    const process = processBucket.data as Process;
+                    return (
+                      <Row
+                        key={pIndex}
+                        start={processBucket.start}
+                        end={processBucket.end}
+                        containerClassName="mx-0 my-0.5 py-1 bg-blue-200 whitespace-nowrap"
+                      >
+                        <p>PID:{process.pid}</p>
+                      </Row>
+                    );
+                  }
+                )}
+              </Row>
+            );
+          }}
+        />
+      </>
     </SubscriptionControl>
   );
 }
