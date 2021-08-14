@@ -27,10 +27,8 @@ function SubscriptionControl({
   const [currentState, setCurrentState] = useState(
     SubscriptionState.NOT_STARTED
   );
-  const [
-    ,
-    { subscribeMonitor, subscribeReplay, unsubscribe },
-  ] = useTimeseriesSubscription(type);
+  const [, { subscribeMonitor, subscribeReplay, unsubscribe }] =
+    useTimeseriesSubscription(type);
   const [, download] = useTimeseriesPersistence();
 
   const _startMonitor = useCallback(() => {
@@ -46,10 +44,11 @@ function SubscriptionControl({
     [setCurrentState, subscribeReplay]
   );
 
-  const _pause = useCallback(() => {
-    setCurrentState(SubscriptionState.PAUSED);
-    unsubscribe();
-  }, [setCurrentState, unsubscribe]);
+  // Commenting out until this is necessary.
+  // const _pause = useCallback(() => {
+  //   setCurrentState(SubscriptionState.PAUSED);
+  //   unsubscribe();
+  // }, [setCurrentState, unsubscribe]);
 
   const _resume = useCallback(() => {
     setCurrentState(SubscriptionState.RUNNING);
@@ -169,7 +168,7 @@ function SubscriptionControl({
   return (
     <div className="flex flex-col flex-1 relative h-full">
       {renderButtons()}
-      <div className={contentClass}>{children}</div>
+      <div className={`flex flex-col ${contentClass}`}>{children}</div>
     </div>
   );
 }

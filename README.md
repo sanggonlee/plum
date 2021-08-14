@@ -35,6 +35,8 @@ He likes making jokes, but this time he wasn't joking. I found this very enterta
 ![Screenshot-2](/screenshots/2.png)
 * Control interval for realtime update, which tables to monitor, etc.
 ![Screenshot-3](/screenshots/3.png)
+* Monitor the total number of locks currently held by any processes.
+![Screenshot-4](/screenshots/4.png)
 
 ## Instructions
 

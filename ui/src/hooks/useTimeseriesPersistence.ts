@@ -8,10 +8,8 @@ import { formatTimeseriesFilename } from "utils";
 
 export default function useTimeseriesPersistence(): [Function, Function] {
   const [storedSettings] = useCachedLocalStorage(LocalStorageFixedKey.Settings);
-  const [timeseriesStart, setTimeseriesStart]: [
-    number,
-    Function
-  ] = useRecoilState(timeseriesStartState);
+  const [timeseriesStart, setTimeseriesStart]: [number, Function] =
+    useRecoilState(timeseriesStartState);
 
   const _download = useCallback(() => {
     if (!storedSettings.saveToFile) {
